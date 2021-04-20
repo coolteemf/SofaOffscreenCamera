@@ -1,6 +1,13 @@
-#!/usr/bin/python3
 import Sofa
+import SofaRuntime
+import Sofa.Core
+# import Sofa.Gui
+import Sofa.Simulation
+import SofaRuntime
+from Sofa.constants import *
 
+SofaRuntime.PluginRepository.addFirstPath('/home/francois/Projects/SofaOffscreenCamera/build/v20.12/install/lib')
+import SofaOffscreenCamera
 
 def createScene(root):
     root.addObject('RequiredPlugin', pluginName=[
@@ -16,10 +23,8 @@ def createScene(root):
     root.beam.addObject('OffscreenCamera',
                         name='camera_beam_and_ball',
                         filepath='%s_%i.png',
-                        widthViewport=800,
-                        heightViewport=800,
                         save_frame_before_first_step=True,
-                        save_frame_after_each_n_steps=1,
+                        save_frame_after_each_n_steps=0,
                         position=[-20, 0, 0], lookAt=[0, 0, 0], zNear=0.01, zFar=200, computeZClip=False, projectionType=1)
 
     # Solver
@@ -50,8 +55,6 @@ def createScene(root):
     root.beam.ball.addObject('OffscreenCamera',
                              name='camera_only_ball',
                              filepath='%s_%i.png',
-                             widthViewport=1920,
-                             heightViewport=1080,
                              save_frame_before_first_step=True,
                              save_frame_after_each_n_steps=1,
                              position=[-20, 0, 0], lookAt=[0, 0, 0], zNear=0.01, zFar=200, computeZClip=False, projectionType=1)
@@ -64,6 +67,12 @@ if __name__ == "__main__":
     createScene(root)
     Sofa.Simulation.init(root)
     Sofa.Simulation.initTextures(root)
+
+    camera = root.beam.camera_beam_and_ball
+    camera.widthViewport = 512
+    camera.heightViewport = 512
     for _ in range(5):
+        print(f"animate {_}")
+        camera.save_frame(f'frame_{_ + 1}.jpg')
         Sofa.Simulation.animate(root, 1)
         Sofa.Simulation.updateVisual(root)
